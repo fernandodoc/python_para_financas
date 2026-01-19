@@ -1,0 +1,34 @@
+🛡️ Guia de Boas Práticas: Precisão e Segurança de Dados
+Este guia estabelece os padrões técnicos para o desenvolvimento do Terminal de Inteligência, garantindo que as análises entregues ao investidor sejam confiáveis, seguras e auditáveis.
+
+1. Precisão e Integridade dos Cálculos
+Dados financeiros exigem tratamento especial para evitar erros cumulativos.
+
+Ponto Flutuante: Nunca utilize float para cálculos monetários críticos que envolvam somas de grandes volumes. Prefira a biblioteca decimal para manter a precisão de centavos.
+
+Tratamento de Nulos (NaN): Ativos podem ter negociações suspensas. Sempre trate dados faltantes com .fillna() ou .dropna() antes de calcular indicadores como RSI ou Médias Móveis.
+
+Arredondamento Final: Realize arredondamentos apenas na exibição para o usuário (ex: f"{valor:.2f}"). Mantenha a precisão total nos cálculos internos.
+
+2. Validação de Fontes de DadosO terminal consome APIs externas (CVM, BCB, Yahoo Finance). 
+Devemos assumir que elas podem falhar.Caching: Utilize st.cache_data para evitar requisições excessivas às APIs. Isso protege seu IP de ser banido (Rate Limiting) e acelera o terminal.
+Sanitização de Inputs: Sempre limpe o CNPJ ou Ticker inserido pelo usuário (remover espaços, pontos e converter para maiúsculas) antes de disparar a consulta.
+Check de Sanidade: Antes de exibir um Preço Justo, verifique se o valor é racional (ex: se o preço calculado é $> 0$ e se os indicadores base não são negativos).
+
+3. Segurança e Privacidade
+Mesmo sendo uma ferramenta local/web, a segurança é primordial.
+
+Variáveis de Ambiente: Nunca escreva chaves de API ou senhas diretamente no código (hardcoded). Utilize arquivos .env ou o st.secrets do Streamlit.
+
+Princípio do Menor Privilégio: O terminal deve ter apenas permissão de leitura de dados. Nunca dê permissões de escrita em bancos de dados ou corretoras sem necessidade.
+
+Logs de Erro: Implemente blocos try-except que informem ao usuário um erro amigável, mas registrem o erro técnico detalhado internamente para correção.
+
+4. Auditoria e Transparência
+O investidor precisa saber de onde veio o dado.
+
+Timestamp: Sempre exiba a data e hora da última atualização do dado (ex: "Dados atualizados em: 19/01/2026").
+
+Notas de Rodapé: Se um cálculo (como Graham) utiliza uma premissa (como a constante 22.5), deixe isso explícito na interface.
+
+Versionamento: Utilize o Git para documentar cada alteração na lógica de cálculo, permitindo rastrear quando uma fórmula foi alterada.
